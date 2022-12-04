@@ -1,6 +1,5 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import { signIn } from "next-auth/react";
 
 const Home: NextPage = () => {
@@ -17,7 +16,7 @@ const Home: NextPage = () => {
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <p className="py-8 text-center text-4xl text-white">❤️ Sarah + Luke ❤️</p>
         <div className="container flex flex-col items-center justify-center gap-8 px-4 py-4 ">
-          <Image
+          <img
             src="/couple-1-crop.jpg"
             className="rounded-full object-scale-down"
             width="200"
