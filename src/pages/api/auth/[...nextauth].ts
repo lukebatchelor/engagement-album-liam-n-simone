@@ -1,15 +1,21 @@
-import NextAuth, { type User, type NextAuthOptions } from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import crypto from "node:crypto";
 
 import { env } from "../../../env/server.mjs";
 
 export const authOptions: NextAuthOptions = {
-  // Include user.id on session
   callbacks: {
-    session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub || ""; // token.sub is the user.id
+    jwt({ token, user, account }) {
+      // user is only passed to us on sign in, persist the user info to the token here
+      if (user) {
+        token.isAdmin = user.isAdmin;
+        token.name = user.id;
+      }
+      return token;
+    },
+    async session({ session, user, token }) {
+      if (session.user && token) {
+        session.user.isAdmin = token.isAdmin;
       }
       return session;
     },
@@ -23,14 +29,14 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials, req) {
-        const user: User = { id: "user-1" };
-        if (
-          crypto.timingSafeEqual(
-            Buffer.from(credentials?.password || ""),
-            Buffer.from(env.APPLICATION_PASSWORD)
-          )
-        ) {
-          return user;
+        // originally using crypto.timingSafeCompare but it's too much of a hassle
+        // to also have to compare string lengths since we're not hashing the pw's
+        const userPass = credentials?.password;
+
+        if (userPass === env.APPLICATION_PASSWORD) {
+          return { id: "user-1", isAdmin: false };
+        } else if (userPass === env.APPLICATION_ADMIN_PASSWORD) {
+          return { id: "admin-1", isAdmin: true };
         }
 
         // Return null if user data could not be retrieved

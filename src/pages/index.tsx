@@ -24,11 +24,11 @@ const Home: NextPage = () => {
             height="200"
             alt="Avatar"
           />
-          <p className="text-1xl text-center text-white">
+          <p className="text-center text-xl text-white">
             Welcome to our online engagement album upload portal. We thank you so much for joining
             us on this special day...
           </p>
-          <p className="text-1xl text-center text-white">
+          <p className="text-center text-xl text-white">
             If you would like to have a photo printed out for our engagement album, please enter the
             password below
           </p>
@@ -43,7 +43,12 @@ const Home: NextPage = () => {
 
             <button
               className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20"
-              onClick={() => signIn("credentials", { password: "password" })}
+              onClick={() =>
+                signIn("credentials", {
+                  password: (document.getElementById("password") as HTMLInputElement).value,
+                  callbackUrl: "/upload",
+                })
+              }
             >
               Sign in
             </button>

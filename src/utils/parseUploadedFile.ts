@@ -1,7 +1,6 @@
 import formidable from "formidable";
 import type { NextApiRequest } from "next";
 import { join } from "path";
-import { mkdir, stat } from "fs/promises";
 import crypto from "node:crypto";
 
 import { env } from "../env/server.mjs";
@@ -18,7 +17,7 @@ export const parseUploadedFile = async (req: NextApiRequest): Promise<ParsedFiel
       uploadDir,
       keepExtensions: true,
       filename: (name, ext) => {
-        const newName = `${Date.now()}-${crypto.randomBytes(10).toString("hex")}${ext}`;
+        const newName = `${crypto.randomBytes(10).toString("hex")}${ext}`;
         console.log("Uploaded file, new name: ", newName);
         return newName;
       },

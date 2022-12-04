@@ -6,14 +6,24 @@ import { useRouter } from "next/router";
 import { signIn, useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
+type UploadResp = {
+  image_id: string;
+  authorName: string;
+  fileName: string;
+};
+
 const Upload: NextPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [selectedFile, setSelectedFile] = useState<File>();
   const [preview, setPreview] = useState<string>();
+  const [error, setError] = useState<string>("");
+  const [uploadResp, setUploadResp] = useState<UploadResp>();
 
   if (status === "unauthenticated") {
     router.push("/");
+  } else if (status === "authenticated" && session.user?.isAdmin) {
+    router.push("/admin");
   }
   // Not going to worry about loading state here
 
@@ -42,6 +52,10 @@ const Upload: NextPage = () => {
 
       const formData = new FormData();
       formData.append("media", selectedFile);
+      formData.append(
+        "authorName",
+        (document.getElementById("authorName") as HTMLInputElement).value
+      );
 
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -51,10 +65,10 @@ const Upload: NextPage = () => {
       const { data, error } = await res.json();
 
       if (error || !data) {
-        alert(error || "Sorry! something went wrong.");
+        setError(error || "Sorry! something went wrong.");
         return;
       }
-
+      setUploadResp(data);
       console.log("File was uploaded successfully:", data);
     } catch (error) {
       console.error(error);
@@ -72,65 +86,91 @@ const Upload: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col  bg-gradient-to-b from-[#2e026d] to-[#15162c] px-8">
+      <main className="flex min-h-screen flex-col  bg-gradient-to-b from-[#2e026d] to-[#15162c] px-8 pb-24">
         <p className="py-8 text-center text-4xl text-white">Add your photo</p>
 
-        <div className="flex w-full flex-col items-center justify-center">
-          <label
-            htmlFor="dropzone-file"
-            className="dark:hover:bg-bray-800 flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-          >
-            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-              {preview && (
-                <img src={preview} alt="preview" className="max-h-20 object-scale-down" />
-              )}
-              {!preview && (
-                <svg
-                  aria-hidden="true"
-                  className="mb-3 h-10 w-10 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  ></path>
-                </svg>
-              )}
-
-              <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="font-semibold">Click to upload</span> or drag and drop
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF</p>
-            </div>
-            <input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} />
-          </label>
-        </div>
-
-        <div className="mt-4 flex flex-col items-center gap-2">
-          <input
-            type="text"
-            className="form-control m-0 inline-block rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
-            id="name"
-            data-lpignore="true"
-            placeholder="Your name"
-          />
-
-          <button
-            className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
-            onClick={onUpload}
-            disabled={!preview}
-          >
-            Upload
-          </button>
-        </div>
+        {uploadResp === undefined && (
+          <UploadControls preview={preview} onFileChange={onFileChange} onUpload={onUpload} />
+        )}
+        {uploadResp !== undefined && (
+          <div className="flex w-full flex-grow flex-col items-center justify-center ">
+            <p className="py-4 text-center text-xl text-white">Thanks {uploadResp.authorName}</p>
+            <p className="text-center text-xl text-white">Your photo number is</p>
+            <p className="py-4 text-center text-4xl text-white">#{uploadResp.image_id}</p>
+            <p className="text-center text-xl text-white">
+              Please write this number in the photo box next to your message so we can get it
+              printed
+            </p>
+          </div>
+        )}
       </main>
     </>
   );
 };
+
+type UploadControlsProps = {
+  preview?: string;
+  onFileChange: React.ChangeEventHandler<HTMLInputElement>;
+  onUpload: React.MouseEventHandler<HTMLButtonElement>;
+};
+
+function UploadControls(props: UploadControlsProps) {
+  const { preview, onFileChange, onUpload } = props;
+
+  return (
+    <>
+      <div className="flex w-full flex-col items-center justify-center">
+        <label
+          htmlFor="dropzone-file"
+          className="dark:hover:bg-bray-800 flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        >
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            {preview && <img src={preview} alt="preview" className="max-h-20 object-scale-down" />}
+            {!preview && (
+              <svg
+                aria-hidden="true"
+                className="mb-3 h-10 w-10 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                ></path>
+              </svg>
+            )}
+
+            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              <span className="font-semibold">Click to upload</span> or drag and drop
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF</p>
+          </div>
+          <input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} />
+        </label>
+      </div>
+      <div className="mt-4 flex flex-col items-center gap-2">
+        <input
+          type="text"
+          className="form-control m-0 inline-block rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+          id="authorName"
+          data-lpignore="true"
+          placeholder="Your name"
+        />
+
+        <button
+          className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
+          onClick={onUpload}
+          disabled={!preview}
+        >
+          Upload
+        </button>
+      </div>
+    </>
+  );
+}
 
 export default Upload;
