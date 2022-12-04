@@ -1,7 +1,10 @@
 {
   "name": "get-engaged-app",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
+  "repository": {
+    "url": "https://github.com/lukebatchelor/engagement-album"
+  },
   "scripts": {
     "build": "next build",
     "dev": "next dev",
