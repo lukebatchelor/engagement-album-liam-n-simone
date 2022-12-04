@@ -13,7 +13,7 @@ jobs:
           node-version: "14.x"
           cache: "yarn"
       - run: yarn install --frozen-lockfile
-      - run: yarn build
+      - run: SKIP_ENV_VALIDATION=true yarn build
       - run: yarn release:create
       - uses: Klemensas/action-autotag@stable
         id: update_tag
