@@ -72,7 +72,7 @@ const Upload: NextPage = () => {
       console.log("File was uploaded successfully:", data);
     } catch (error) {
       console.error(error);
-      alert("Sorry! something went wrong.");
+      alert("Sorry! something went wrong. " + error);
     }
   };
 
