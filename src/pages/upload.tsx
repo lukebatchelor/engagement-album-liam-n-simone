@@ -86,7 +86,9 @@ const Upload: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col  bg-gradient-to-b from-[#2e026d] to-[#15162c] px-8 pb-24">
-        <p className="py-8 text-center text-4xl text-white">Add your photo</p>
+        <p className="py-8 text-center text-4xl text-white">
+          {uploadResp === undefined ? "Add your photo" : "Uploaded!"}
+        </p>
 
         {uploadResp === undefined && (
           <UploadControls preview={preview} onFileChange={onFileChange} onUpload={onUpload} />
