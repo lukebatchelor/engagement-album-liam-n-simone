@@ -16,6 +16,7 @@ const Upload: NextPage = () => {
   const { data: session, status } = useSession();
   const [selectedFile, setSelectedFile] = useState<File>();
   const [preview, setPreview] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [uploadResp, setUploadResp] = useState<UploadResp>();
 
@@ -48,6 +49,7 @@ const Upload: NextPage = () => {
   const onUpload = async (e: React.MouseEvent<HTMLElement>) => {
     try {
       if (!selectedFile) return;
+      setLoading(true);
 
       const formData = new FormData();
       formData.append("media", selectedFile);
@@ -69,7 +71,9 @@ const Upload: NextPage = () => {
       }
       setUploadResp(data);
       console.log("File was uploaded successfully:", data);
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.error(error);
       alert("Sorry! something went wrong. " + error);
     }
@@ -91,7 +95,12 @@ const Upload: NextPage = () => {
         </p>
 
         {uploadResp === undefined && (
-          <UploadControls preview={preview} onFileChange={onFileChange} onUpload={onUpload} />
+          <UploadControls
+            preview={preview}
+            onFileChange={onFileChange}
+            onUpload={onUpload}
+            loading={loading}
+          />
         )}
         {uploadResp !== undefined && (
           <div className="flex w-full flex-grow flex-col items-center justify-center ">
@@ -110,12 +119,13 @@ const Upload: NextPage = () => {
 
 type UploadControlsProps = {
   preview?: string;
+  loading: boolean;
   onFileChange: React.ChangeEventHandler<HTMLInputElement>;
   onUpload: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 function UploadControls(props: UploadControlsProps) {
-  const { preview, onFileChange, onUpload } = props;
+  const { preview, onFileChange, onUpload, loading } = props;
 
   return (
     <>
@@ -164,9 +174,9 @@ function UploadControls(props: UploadControlsProps) {
         <button
           className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
           onClick={onUpload}
-          disabled={!preview}
+          disabled={!preview || loading}
         >
-          Upload
+          {loading ? "Loading" : "Upload"}
         </button>
       </div>
     </>
