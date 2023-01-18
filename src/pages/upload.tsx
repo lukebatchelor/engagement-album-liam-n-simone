@@ -1,9 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
+import Confetti from "react-confetti";
+import { useWindowSize } from "../utils/useWindowSize";
 
 type UploadResp = {
   image_id: string;
@@ -19,13 +20,13 @@ const Upload: NextPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [uploadResp, setUploadResp] = useState<UploadResp>();
+  const { height, width } = useWindowSize();
 
   if (status === "unauthenticated") {
     router.push("/");
   } else if (status === "authenticated" && session.user?.isAdmin) {
     router.push("/admin");
   }
-  // Not going to worry about loading state here
 
   // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
   useEffect(() => {
@@ -89,6 +90,7 @@ const Upload: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Confetti height={height} width={width} run={!!uploadResp} />
       <main className="flex min-h-screen flex-col  bg-gradient-to-b from-[#2e026d] to-[#15162c] px-8 pb-24">
         <p className="py-8 text-center text-4xl text-white">
           {uploadResp === undefined ? "Add your photo" : "Uploaded!"}

@@ -9,7 +9,6 @@ const Admin: NextPage = () => {
   const [uploadedImages, setUploadedImages] = useState<ImageUpload[]>();
   const { data: session, status } = useSession();
   const router = useRouter();
-  console.log({ uploadedImages });
 
   useEffect(() => {
     fetch("/api/uploads")

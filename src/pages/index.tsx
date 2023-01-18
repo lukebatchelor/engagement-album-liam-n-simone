@@ -13,6 +13,7 @@ const Home: NextPage = () => {
     const pw = queryParams.get("pw");
     passwordRef.current!.value = pw!;
   }, []);
+
   return (
     <>
       <Head>
