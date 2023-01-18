@@ -97,8 +97,7 @@ const Upload: NextPage = () => {
             <p className="text-center text-xl text-white">Your photo number is</p>
             <p className="py-4 text-center text-4xl text-white">#{uploadResp.image_id}</p>
             <p className="text-center text-xl text-white">
-              Please write this number in the photo box next to your message so we can get it
-              printed
+              Please write this number in the box next to your message so we can print it
             </p>
           </div>
         )}

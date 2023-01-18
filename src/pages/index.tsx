@@ -1,8 +1,18 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn } from "next-auth/react";
+import { useEffect, useRef } from "react";
 
 const Home: NextPage = () => {
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const queryParams = new URLSearchParams(window.location.search);
+    if (!queryParams.has("pw")) return;
+    const pw = queryParams.get("pw");
+    passwordRef.current!.value = pw!;
+  }, []);
   return (
     <>
       <Head>
@@ -24,12 +34,10 @@ const Home: NextPage = () => {
             alt="Avatar"
           />
           <p className="text-center text-xl text-white">
-            Welcome to our online engagement album upload portal. We thank you so much for joining
-            us on this special day...
+            Welcome to our online engagement album. Thank you so much for joining us today!
           </p>
           <p className="text-center text-xl text-white">
-            If you would like to have a photo printed out for our engagement album, please enter the
-            password below
+            Sign in below to upload your selfie with one or both of us
           </p>
           <div className="flex flex-col items-center gap-2">
             <input
@@ -38,6 +46,7 @@ const Home: NextPage = () => {
               id="password"
               data-lpignore="true"
               placeholder="Password"
+              ref={passwordRef}
             />
 
             <button
