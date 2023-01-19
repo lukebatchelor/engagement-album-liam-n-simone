@@ -47,7 +47,8 @@ const Upload: NextPage = () => {
     if (files && files[0]) setSelectedFile(files[0]);
   };
 
-  const onUpload = async (e: React.MouseEvent<HTMLElement>) => {
+  const onUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       if (!selectedFile) return;
       setLoading(true);
@@ -164,23 +165,25 @@ function UploadControls(props: UploadControlsProps) {
           <input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} />
         </label>
       </div>
-      <div className="mt-4 flex flex-col items-center gap-2">
-        <input
-          type="text"
-          className="form-control m-0 inline-block rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
-          id="authorName"
-          data-lpignore="true"
-          placeholder="Your name"
-        />
+      <form onSubmit={onUpload} autoComplete="off">
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <input
+            type="text"
+            className="form-control m-0 inline-block rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+            id="authorName"
+            data-lpignore="true"
+            placeholder="Your name"
+          />
 
-        <button
-          className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
-          onClick={onUpload}
-          disabled={!preview || loading}
-        >
-          {loading ? "Loading" : "Upload"}
-        </button>
-      </div>
+          <button
+            className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
+            type="submit"
+            disabled={!preview || loading}
+          >
+            {loading ? "Loading" : "Upload"}
+          </button>
+        </div>
+      </form>
     </>
   );
 }

@@ -40,28 +40,34 @@ const Home: NextPage = () => {
           <p className="text-center text-xl text-white">
             Sign in below to upload your selfie with one or both of us
           </p>
-          <div className="flex flex-col items-center gap-2">
-            <input
-              type="password"
-              className="form-control m-0 inline-block rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
-              id="password"
-              data-lpignore="true"
-              placeholder="Password"
-              ref={passwordRef}
-            />
+          <form
+            autoComplete="off"
+            onSubmit={(e) => {
+              e.preventDefault();
+              signIn("credentials", {
+                password: passwordRef.current!.value,
+                callbackUrl: "/upload",
+              });
+            }}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <input
+                type="password"
+                className="form-control m-0 inline-block rounded border border-solid border-gray-300 bg-white bg-clip-padding px-3 py-1.5 text-base font-normal text-gray-700 transition ease-in-out focus:border-blue-600 focus:bg-white focus:text-gray-700 focus:outline-none"
+                id="password"
+                data-lpignore="true"
+                placeholder="Password"
+                ref={passwordRef}
+              />
 
-            <button
-              className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20"
-              onClick={() =>
-                signIn("credentials", {
-                  password: (document.getElementById("password") as HTMLInputElement).value,
-                  callbackUrl: "/upload",
-                })
-              }
-            >
-              Sign in
-            </button>
-          </div>
+              <button
+                className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20"
+                type="submit"
+              >
+                Sign in
+              </button>
+            </div>
+          </form>
         </div>
       </main>
     </>
