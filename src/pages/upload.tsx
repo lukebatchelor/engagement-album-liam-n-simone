@@ -124,7 +124,7 @@ type UploadControlsProps = {
   preview?: string;
   loading: boolean;
   onFileChange: React.ChangeEventHandler<HTMLInputElement>;
-  onUpload: React.MouseEventHandler<HTMLButtonElement>;
+  onUpload: React.FormEventHandler;
 };
 
 function UploadControls(props: UploadControlsProps) {
