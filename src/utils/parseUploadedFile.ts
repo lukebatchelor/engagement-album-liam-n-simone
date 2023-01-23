@@ -13,7 +13,8 @@ export const parseUploadedFile = async (req: NextApiRequest): Promise<ParsedFiel
     const uploadDir = join(process.cwd(), env.UPLOADED_IMGS_DIR);
 
     const form = formidable({
-      maxFiles: 1,
+      maxFiles: Infinity,
+      multiples: true,
       uploadDir,
       keepExtensions: true,
       filename: (name, ext) => {

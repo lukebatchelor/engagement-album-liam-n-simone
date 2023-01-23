@@ -1,3 +1,4 @@
+import { ImageUpload } from "@prisma/client";
 import formidable from "formidable";
 import { type NextApiRequest, type NextApiResponse } from "next";
 
@@ -14,19 +15,33 @@ const uploadApi = async (req: NextApiRequest, res: NextApiResponse) => {
     const { fields, files } = await parseUploadedFile(req);
     const authorName = fields.authorName as string;
 
-    if (!files || !files.media || files.media instanceof Array) {
+    if (!files || !files.media) {
       res.status(400).json({ data: null, error: "Invalid file was uploaded" });
     }
 
-    const created = await prisma.imageUpload.create({
-      data: { fileName: (files.media as formidable.File).newFilename, authorName },
-    });
+    let created: ImageUpload[] = [];
+    if (files.media instanceof Array) {
+      created = await Promise.all(
+        files.media.map((file) =>
+          prisma.imageUpload.create({
+            data: { fileName: (file as formidable.File).newFilename, authorName },
+          })
+        )
+      );
+    } else {
+      const newCreated = await prisma.imageUpload.create({
+        data: { fileName: (files.media as formidable.File).newFilename, authorName },
+      });
+      created.push(newCreated);
+    }
 
     res.status(200).json({
       data: {
-        image_id: created.id,
-        fileName: created.fileName,
-        authorName: created.authorName,
+        authorName,
+        files: created.map((file) => ({
+          image_id: file.id,
+          fileName: file.fileName,
+        })),
       },
       error: null,
     });

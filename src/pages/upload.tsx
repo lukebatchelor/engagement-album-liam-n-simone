@@ -7,16 +7,15 @@ import Confetti from "react-confetti";
 import { useWindowSize } from "../utils/useWindowSize";
 
 type UploadResp = {
-  image_id: string;
   authorName: string;
-  fileName: string;
+  files: Array<{ image_id: string; fileName: string }>;
 };
 
 const Upload: NextPage = () => {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [selectedFile, setSelectedFile] = useState<File>();
-  const [preview, setPreview] = useState<string>();
+  const [selectedFiles, setSelectedFiles] = useState<FileList>();
+  const [previews, setPreviews] = useState<string[]>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [uploadResp, setUploadResp] = useState<UploadResp>();
@@ -30,31 +29,35 @@ const Upload: NextPage = () => {
 
   // https://stackoverflow.com/questions/38049966/get-image-preview-before-uploading-in-react
   useEffect(() => {
-    if (!selectedFile) {
-      setPreview(undefined);
+    if (!selectedFiles) {
+      setPreviews(undefined);
       return;
     }
 
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreview(objectUrl);
+    const objectUrls = [...selectedFiles].map((file) => URL.createObjectURL(file));
+    setPreviews(objectUrls);
 
     // free memory when ever this component is unmounted
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
+    return () => {
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedFiles]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files[0]) setSelectedFile(files[0]);
+    if (files && files[0]) setSelectedFiles(files);
   };
 
   const onUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (!selectedFile) return;
+      if (!selectedFiles) return;
       setLoading(true);
 
       const formData = new FormData();
-      formData.append("media", selectedFile);
+      [...selectedFiles].forEach((file) => {
+        formData.append("media", file);
+      });
       formData.append(
         "authorName",
         (document.getElementById("authorName") as HTMLInputElement).value
@@ -99,7 +102,7 @@ const Upload: NextPage = () => {
 
         {uploadResp === undefined && (
           <UploadControls
-            preview={preview}
+            previews={previews}
             onFileChange={onFileChange}
             onUpload={onUpload}
             loading={loading}
@@ -108,10 +111,25 @@ const Upload: NextPage = () => {
         {uploadResp !== undefined && (
           <div className="flex w-full flex-grow flex-col items-center justify-center ">
             <p className="py-4 text-center text-xl text-white">Thanks {uploadResp.authorName}</p>
-            <p className="text-center text-xl text-white">Your photo number is</p>
-            <p className="py-4 text-center text-4xl text-white">#{uploadResp.image_id}</p>
             <p className="text-center text-xl text-white">
-              Please write this number in the box next to your message so we can print it
+              {uploadResp.files.length === 1 ? "Your photo number is" : "Your photo numbers are"}
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 py-4 ">
+              {uploadResp.files.map((file) => (
+                <div key={file.fileName} className="flex flex-col justify-center">
+                  <img
+                    src={`/uploads/${file.fileName}`}
+                    alt="preview"
+                    className="max-h-20 object-scale-down"
+                  />
+                  <div className="text-center text-white">#{file.image_id}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-center text-xl text-white">
+              {uploadResp.files.length === 1
+                ? "Please write this number in the box next to your message so we can print it"
+                : "You can add one of these numbers in the box next to your message and we'll print it out"}
             </p>
           </div>
         )}
@@ -121,14 +139,14 @@ const Upload: NextPage = () => {
 };
 
 type UploadControlsProps = {
-  preview?: string;
+  previews?: string[];
   loading: boolean;
   onFileChange: React.ChangeEventHandler<HTMLInputElement>;
   onUpload: React.FormEventHandler;
 };
 
 function UploadControls(props: UploadControlsProps) {
-  const { preview, onFileChange, onUpload, loading } = props;
+  const { previews, onFileChange, onUpload, loading } = props;
 
   return (
     <>
@@ -138,8 +156,19 @@ function UploadControls(props: UploadControlsProps) {
           className="dark:hover:bg-bray-800 flex h-64 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            {preview && <img src={preview} alt="preview" className="max-h-20 object-scale-down" />}
-            {!preview && (
+            {!!previews && (
+              <div className="mb-2 flex flex-wrap justify-center gap-2">
+                {previews.map((preview, idx) => (
+                  <img
+                    key={idx}
+                    src={preview}
+                    alt="preview"
+                    className="max-h-20 object-scale-down"
+                  />
+                ))}
+              </div>
+            )}
+            {!previews && (
               <svg
                 aria-hidden="true"
                 className="mb-3 h-10 w-10 text-gray-400"
@@ -162,7 +191,13 @@ function UploadControls(props: UploadControlsProps) {
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF</p>
           </div>
-          <input id="dropzone-file" type="file" className="hidden" onChange={onFileChange} />
+          <input
+            id="dropzone-file"
+            type="file"
+            className="hidden"
+            onChange={onFileChange}
+            multiple
+          />
         </label>
       </div>
       <form onSubmit={onUpload} autoComplete="off">
@@ -178,7 +213,7 @@ function UploadControls(props: UploadControlsProps) {
           <button
             className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
             type="submit"
-            disabled={!preview || loading}
+            disabled={!previews || loading}
           >
             {loading ? "Loading" : "Upload"}
           </button>

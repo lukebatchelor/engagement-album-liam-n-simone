@@ -48,6 +48,7 @@ const Admin: NextPage = () => {
                   src={`/uploads/${image.fileName}`}
                   alt={`Uploaded by ${image.authorName}`}
                   className="h-auto max-w-full"
+                  loading="lazy"
                 />
               </div>
             ))}
