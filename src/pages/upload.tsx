@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -90,14 +91,14 @@ const Upload: NextPage = () => {
         <title>Engagement Album</title>
         <meta
           name="description"
-          content="An online portal for uploading photos for Sarah and Luke's engagement album"
+          content="An online portal for uploading photos from Simone and Liam's engagement party"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Confetti height={height} width={width} run={!!uploadResp} />
-      <main className="flex min-h-screen flex-col  bg-gradient-to-b from-[#2e026d] to-[#15162c] px-8 pb-24">
-        <p className="py-8 text-center text-4xl text-white">
-          {uploadResp === undefined ? "Add your photo" : "Uploaded!"}
+      <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-bl from-cyan-200 to-blue-500 px-8 pb-24">
+        <p className="py-8 text-center text-4xl ">
+          {uploadResp === undefined ? "Share your photos" : "Uploaded!"}
         </p>
 
         {uploadResp === undefined && (
@@ -110,9 +111,9 @@ const Upload: NextPage = () => {
         )}
         {uploadResp !== undefined && (
           <div className="flex w-full flex-grow flex-col items-center justify-center ">
-            <p className="py-4 text-center text-xl text-white">Thanks {uploadResp.authorName}</p>
-            <p className="text-center text-xl text-white">
-              {uploadResp.files.length === 1 ? "Your photo number is" : "Your photo numbers are"}
+            <p className="py-4 text-center text-xl">Thanks {uploadResp.authorName}!</p>
+            <p className="text-center text-xl">
+              We have received your photos!
             </p>
             <div className="flex flex-wrap justify-center gap-4 py-4 ">
               {uploadResp.files.map((file) => (
@@ -122,14 +123,11 @@ const Upload: NextPage = () => {
                     alt="preview"
                     className="max-h-20 object-scale-down"
                   />
-                  <div className="text-center text-white">#{file.image_id}</div>
                 </div>
               ))}
             </div>
-            <p className="text-center text-xl text-white">
-              {uploadResp.files.length === 1
-                ? "Please write this number in the box next to your message so we can print it"
-                : "You can add one of these numbers in the box next to your message and we'll print it out"}
+            <p className="text-center text-xl">
+             Love you long time!
             </p>
           </div>
         )}
@@ -211,7 +209,7 @@ function UploadControls(props: UploadControlsProps) {
           />
 
           <button
-            className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20 disabled:opacity-30"
+            className="my-2 rounded-full bg-white/10 px-5 py-2 font-semibold no-underline transition hover:bg-white/20 disabled:opacity-30"
             type="submit"
             disabled={!previews || loading}
           >

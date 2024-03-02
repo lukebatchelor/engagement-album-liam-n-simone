@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn } from "next-auth/react";
 import { useEffect, useRef } from "react";
+import { HeroImage } from "../components/HeroImage";
 
 const Home: NextPage = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -20,25 +21,23 @@ const Home: NextPage = () => {
         <title>Engagement Album</title>
         <meta
           name="description"
-          content="An online portal for uploading photos for Sarah and Luke's egagement album"
+          content="An online portal for uploading photos from Simone and Liam's engagement party"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <p className="py-8 text-center text-4xl text-white">❤️ Sarah + Luke ❤️</p>
+      <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-bl from-cyan-200 to-blue-500">
+        <p className="py-4 text-center text-3xl">❤️ Simone and Liam ❤️</p>
+        <p className="text-center text-sm">6th April 2024</p>
         <div className="container flex flex-col items-center justify-center gap-8 px-4 py-4 ">
-          <img
-            src="/couple-1-crop.jpg"
-            className="rounded-full object-scale-down"
-            width="200"
-            height="200"
-            alt="Avatar"
-          />
-          <p className="text-center text-xl text-white">
-            Welcome to our online engagement album. Thank you so much for joining us today!
+          <HeroImage />
+          <p className="text-center text-xl">
+            G&lsquo;day team! We have absolutely loved having you share this day with us!
           </p>
-          <p className="text-center text-xl text-white">
-            Sign in below to upload your selfie with one or both of us
+          <p className="text-center text-xl">
+           We would love it even more if you could share any photos you&lsquo;ve taken too!
+          </p>
+          <p className="text-center text-xl">
+            Please click sign in below (the password is Liam&lsquo;s middle name!)
           </p>
           <form
             autoComplete="off"

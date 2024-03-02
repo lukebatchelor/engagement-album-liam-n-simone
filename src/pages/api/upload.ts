@@ -13,7 +13,7 @@ const uploadApi = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     const { fields, files } = await parseUploadedFile(req);
-    const authorName = fields.authorName as string;
+    const authorName = fields.authorName as string || 'Friend';
 
     if (!files || !files.media) {
       res.status(400).json({ data: null, error: "Invalid file was uploaded" });

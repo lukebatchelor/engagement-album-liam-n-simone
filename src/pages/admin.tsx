@@ -26,12 +26,12 @@ const Admin: NextPage = () => {
         <title>Engagement Album</title>
         <meta
           name="description"
-          content="An online portal for uploading photos for Sarah and Luke's egagement album"
+          content="An online portal for uploading photos from Simone and Liam's engagement party"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col  bg-gradient-to-b from-[#2e026d] to-[#15162c] px-8 pb-24">
-        <p className="py-8 text-center text-4xl text-white">Admin</p>
+      <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-bl from-cyan-200 to-blue-500 px-8 pb-24">
+        <p className="py-8 text-center text-4xl">Our Photos 🥰</p>
         {uploadedImages === undefined && (
           <div className="flex w-full flex-grow flex-col items-center justify-center ">
             <LoadingSpinner />
@@ -41,7 +41,7 @@ const Admin: NextPage = () => {
           <div className="flex flex-col gap-5 px-4">
             {uploadedImages.map((image) => (
               <div key={image.id}>
-                <p className=" text-l text-white">
+                <p className=" text-lg">
                   #{image.id} by {image.authorName}
                 </p>
                 <img
@@ -56,7 +56,7 @@ const Admin: NextPage = () => {
         )}
         {uploadedImages !== undefined && uploadedImages.length === 0 && (
           <div className="flex flex-col gap-5 px-4">
-            <p className=" text-l text-white">No images have been uploaded yet</p>
+            <p className=" text-lg">No images have been uploaded yet</p>
           </div>
         )}
       </main>

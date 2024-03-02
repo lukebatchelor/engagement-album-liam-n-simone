@@ -31,11 +31,11 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         // originally using crypto.timingSafeCompare but it's too much of a hassle
         // to also have to compare string lengths since we're not hashing the pw's
-        const userPass = credentials?.password;
+        const userPass = credentials?.password.toLocaleLowerCase();
 
-        if (userPass === env.APPLICATION_PASSWORD) {
+        if (userPass === env.APPLICATION_PASSWORD.toLocaleLowerCase()) {
           return { id: "user-1", isAdmin: false };
-        } else if (userPass === env.APPLICATION_ADMIN_PASSWORD) {
+        } else if (userPass === env.APPLICATION_ADMIN_PASSWORD.toLocaleLowerCase()) {
           return { id: "admin-1", isAdmin: true };
         }
 

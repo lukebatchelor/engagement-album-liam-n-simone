@@ -3,7 +3,7 @@
   "version": "0.1.10",
   "private": true,
   "repository": {
-    "url": "https://github.com/lukebatchelor/engagement-album"
+    "url": "https://github.com/lukebatchelor/engagement-album-liam-n-simone"
   },
   "scripts": {
     "build": "next build",
