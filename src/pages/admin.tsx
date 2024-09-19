@@ -4,6 +4,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 const Admin: NextPage = () => {
   const [uploadedImages, setUploadedImages] = useState<ImageUpload[]>();
@@ -20,18 +22,43 @@ const Admin: NextPage = () => {
       .catch((err) => router.push("/"));
   }, []);
 
+  const handleDownloadAll = async () => {
+    if (!uploadedImages) return;
+
+    const zip = new JSZip();
+
+    // Add each image to the zip file
+    const imagePromises = uploadedImages.map((image) =>
+      fetch(`/uploads/${image.fileName}`)
+        .then((res) => res.blob())
+        .then((blob) => zip.file(image.fileName, blob))
+    );
+
+    await Promise.all(imagePromises);
+
+    // Generate and download the zip file
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, "all_images.zip");
+  };
+
   return (
     <>
       <Head>
-        <title>Engagement Album</title>
+        <title>Engagement Album - Admin</title>
         <meta
           name="description"
-          content="An online portal for uploading photos from Simone and Liam's engagement party"
+          content="Admin page for Simone and Liam's engagement album"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-bl from-cyan-200 to-blue-500 px-8 pb-24">
         <p className="py-8 text-center text-4xl">Our Photos 🥰</p>
+        <button
+          onClick={handleDownloadAll}
+          className="mb-8 rounded-full bg-white/10 px-5 py-2 font-semibold text-white no-underline transition hover:bg-white/20"
+        >
+          Download All
+        </button>
         {uploadedImages === undefined && (
           <div className="flex w-full flex-grow flex-col items-center justify-center ">
             <LoadingSpinner />

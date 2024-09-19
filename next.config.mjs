@@ -8,6 +8,9 @@
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  images: {
+    unoptimized: true
+  },
   swcMinify: true,
   i18n: {
     locales: ["en"],
